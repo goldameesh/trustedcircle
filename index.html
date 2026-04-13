@@ -2152,16 +2152,12 @@ async function rerunWithTodayIntelligence(idx, e) {
 
   const rerunNote = `\n\nRE-RUN CONTEXT: This is a re-analysis of a previously assessed idea. The original analysis was conducted on ${original.timestamp} and returned a verdict of ${original.verdict}. Apply updated thinking. Note any changes in assessment vs the prior run.`;
 
-  const systemPrompt = buildSystemPromptForMode(original.mode) + `
-
-OUTPUT FORMAT — Return ONLY valid JSON. No markdown, no backticks, no explanation outside JSON.
-Scores are integers 1–5. Legal/ethics gate is "GREEN", "AMBER", or "RED".
-Include all 20 sections. Return the same JSON schema as a standard analysis.`;
-
+  // System prompt built server-side — pass empty string, mode set via capturedIdea
+  capturedIdea.mode = original.mode;
   const userMsg = buildUserMsg(capturedIdea, rerunNote);
 
   try {
-    const result = await callAPI(systemPrompt, userMsg, 6000);
+    const result = await callAPI('', userMsg, 6000);
     result.idea = original.idea;
     result.mode = original.mode;
     result.sector = original.sector || '';
@@ -2197,11 +2193,6 @@ Include all 20 sections. Return the same JSON schema as a standard analysis.`;
   }
 }
 
-function buildSystemPromptForMode(mode) {
-  // Lightweight version for re-runs (full prompt built in buildSystemPrompt but mode-aware)
-  capturedIdea.mode = mode;
-  return buildSystemPrompt();
-}
 
 function showDeltaBanner(original, rerun) {
   // Remove any existing delta banner
