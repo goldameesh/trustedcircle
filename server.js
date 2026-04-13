@@ -250,6 +250,257 @@ OUTPUT FORMAT — Return ONLY valid JSON. No markdown. No backticks. No explanat
 }
 
 
+// ── LAYER 2 ENDPOINT ─────────────────────────────────────────────────────────
+// Focused strategic brief — NOT a repeat of the full analysis
+app.post('/api/layer2', async (req, res) => {
+
+  const { messages, path: l2path, location, originalVerdict, originalIdea, userName, orgName } = req.body;
+  if (!messages || !Array.isArray(messages)) return res.status(400).json({ error: { message: 'Invalid request.' } });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: { message: 'Server configuration error.' } });
+
+  // Detect region for localisation
+  const loc = (location || '').toLowerCase();
+  const isUAE     = loc.includes('uae') || loc.includes('dubai') || loc.includes('abu dhabi') || loc.includes('sharjah') || loc.includes('emirates');
+  const isIndia   = loc.includes('india') || loc.includes('mumbai') || loc.includes('delhi') || loc.includes('bangalore') || loc.includes('bengaluru');
+  const isUK      = loc.includes('uk') || loc.includes('london') || loc.includes('england') || loc.includes('britain');
+  const isSG      = loc.includes('singapore') || loc.includes(' sg ');
+  const isUS      = loc.includes('usa') || loc.includes('united states') || loc.includes('new york') || loc.includes('san francisco');
+
+  const regionNote = isUAE   ? 'User is based in UAE/Gulf. Reference UAE-specific regulators (DIFC, ADGM, DED, SCA, CBUAE), local accelerators (Hub71, Dtec, Turn8, Flat6Labs MENA, Dubai Future Accelerators), funding (ADQ, Mubadala, 216 Capital), and Gulf market dynamics.'
+    : isIndia  ? 'User is based in India. Reference SEBI, RBI, MCA, local accelerators (Sequoia Surge, Blume, 100X, NASSCOM), Startup India, relevant state schemes.'
+    : isUK     ? 'User is based in UK. Reference FCA, Companies House, Innovate UK, British Business Bank, UK-specific funding and regulatory context.'
+    : isSG     ? 'User is based in Singapore. Reference MAS, ACRA, EDB, Enterprise Singapore, local VC ecosystem.'
+    : isUS     ? 'User is based in USA. Reference SEC, SBA, relevant state regulations, US VC/angel ecosystem.'
+    : location ? `User is based in ${location}. Apply the most relevant local regulatory, market, and funding intelligence for this location. If specific local data is unavailable, say so honestly rather than defaulting to US/UK examples.`
+    : 'Location not specified. Apply globally relevant intelligence. Note where local context would improve this analysis.';
+
+  const personalNote = userName ? `This analysis is prepared for ${userName}${orgName ? ', ' + orgName : ''}. Address them directly where natural.` : '';
+
+  const prompts = {
+    vision: `You are a world-class strategic advisor — combining the depth of McKinsey's strategy practice, the market intelligence of Goldman Sachs, and the operator wisdom of someone who has built businesses in emerging markets across Asia, Middle East, Africa, and the West.
+
+Your task: Write a REAL VISION BRIEF for this idea. Not a repeat of the earlier analysis. This is the 3-5 year strategic opportunity map — what could this become if everything is executed with excellence?
+
+${personalNote}
+${regionNote}
+
+MANDATORY FORMAT — Return ONLY valid JSON:
+{
+  "type": "REAL_VISION",
+  "visionStatement": "One powerful paragraph — the 3-5 year vision in concrete, specific terms. Not aspirational fluff. Specific market position, scale, and impact.",
+  "marketOpportunity": "The addressable market — specific size estimates, growth rate, key drivers, and why NOW is the right time. Use real data where possible. Location-specific.",
+  "competitiveMoat": "What makes this defensible at scale? Name specific moat type: network effect / switching cost / proprietary data / regulatory licence / brand / cost structure. Be honest if moat is weak.",
+  "theOneBet": "The single most important strategic decision that will determine success or failure. Not a list. One sentence. The bet that changes everything.",
+  "scenarioBestCase": "If execution is excellent — what does this look like in year 3? Revenue range, team size, market position. Specific.",
+  "scenarioRiskCase": "If the primary risk materialises — what happens? What is the realistic downside? Be honest.",
+  "entryPoint": "The exact first move that makes the 3-5 year vision achievable. Where to start to make this real — location specific.",
+  "advisorNote": "One direct, honest observation the founder needs to hear that they probably haven't heard from anyone else. No flattery. Pure signal."
+}`,
+
+    execution: `You are a world-class execution advisor — combining operational depth of a BCG implementation partner, the regulatory knowledge of a senior lawyer in this market, and the hands-on wisdom of a serial entrepreneur who has built from zero in this specific region.
+
+Your task: Write a REAL EXECUTION BRIEF — the specific 90-day action plan. Not a repeat of the earlier analysis. This is what to actually DO, starting Monday.
+
+${personalNote}
+${regionNote}
+
+MANDATORY FORMAT — Return ONLY valid JSON:
+{
+  "type": "REAL_EXECUTION",
+  "week1": [
+    "Day 1-2: [Specific action with named output]",
+    "Day 3-4: [Specific action with named output]",
+    "Day 5-7: [Specific action with named output]"
+  ],
+  "month1Sprint": "What exists at the end of Month 1 that did not exist at the start? Name the specific deliverables — not activities.",
+  "teamArchitecture": {
+    "critical": "The one role you cannot start without — title, cost range in local currency, where to find them locally",
+    "month3Add": "The second hire — when and why",
+    "avoid": "The hire that looks necessary but is premature — and why"
+  },
+  "capitalRequired": {
+    "minimum": "Minimum capital to reach first proof point — in local currency",
+    "comfortable": "Capital for confident 6-month runway",
+    "raise": "If raising — appropriate instrument and realistic amount for this market at this stage"
+  },
+  "legalPath": {
+    "entityType": "Recommended entity type and why — location specific",
+    "regulator": "Primary regulator and what they require — with real URL",
+    "firstLegalStep": "Exactly what to do in week 1 legally — specific, not generic",
+    "timeline": "Realistic time to be legally operational"
+  },
+  "localResources": [
+    {"name": "Resource name", "what": "What it provides", "url": "Real URL", "relevance": "Why relevant to this specific idea"}
+  ],
+  "thirtyDayFocus": "If you could only do ONE thing in the next 30 days to de-risk this entire venture — what is it and why?",
+  "honestWarning": "The execution failure mode that kills most companies in this space. What to watch for. What the early warning signs look like."
+}`,
+
+    redesign: `You are a turnaround advisor — someone who has seen why ideas fail and knows how to rebuild them stronger. Your task is a REDESIGN BLUEPRINT.
+
+${personalNote}
+${regionNote}
+
+Return ONLY valid JSON:
+{
+  "type": "REDESIGN_BLUEPRINT",
+  "rootCause": "The fundamental structural issue — not a symptom. What is broken at the foundation?",
+  "whatToKeep": "What from the original idea is genuinely worth preserving and why",
+  "whatToChange": "The specific changes needed — not vague pivots. Exact structural alterations.",
+  "redesignedModel": "The redesigned version in plain language — what it is, who it serves, how it makes money",
+  "doesItPass": "Run the redesigned model mentally through the 15 layers — does it survive? Where does it still have risk?",
+  "firstMove": "The first action to test whether the redesign works — before committing resources"
+}`,
+
+    adjacent: `You are a lateral thinking advisor with deep market knowledge. Find ADJACENT OPPORTUNITIES that use similar assets but avoid the blockers found.
+
+${personalNote}
+${regionNote}
+
+Return ONLY valid JSON:
+{
+  "type": "ADJACENT_OPPORTUNITIES",
+  "opportunities": [
+    {
+      "name": "Opportunity name",
+      "what": "What this is — one crisp sentence",
+      "whyItWorks": "Why it avoids the blockers in the original idea",
+      "requires": "What additional assets or capabilities this needs",
+      "quickViability": "GO / PILOT / CAUTION — and the single deciding factor",
+      "firstMove": "The specific first step to test this"
+    }
+  ],
+  "recommendedPath": "Of these options — which one and why. Be direct."
+}`,
+
+    deepdive: `You are a forensic strategy advisor. Go deep on exactly what would need to change for this idea to become viable.
+
+${personalNote}
+${regionNote}
+
+Return ONLY valid JSON:
+{
+  "type": "DEEP_DIVE_BLOCKERS",
+  "blockers": [
+    {
+      "blocker": "Specific blocker name",
+      "rootCause": "Why this blocker exists — not just what it is",
+      "whatChanges": "Exactly what would need to change — regulation / market / team / capital / timing",
+      "timeline": "Realistic timeline for this change",
+      "canInfluence": "Can the founder accelerate this change or must they wait?"
+    }
+  ],
+  "unlockSequence": "If all blockers could be resolved — in what order should they be tackled? Which unlock the others?",
+  "timeToViability": "Honest estimate of when this idea could be viable given the blockers"
+}`
+  };
+
+  const sysPrompt = prompts[l2path] || prompts.vision;
+
+  const bodyString = JSON.stringify({
+    model:      'claude-sonnet-4-20250514',
+    max_tokens: 3000,
+    system:     sysPrompt,
+    messages:   messages
+  });
+
+  const options = {
+    hostname: 'api.anthropic.com',
+    path:     '/v1/messages',
+    method:   'POST',
+    headers:  {
+      'Content-Type':      'application/json',
+      'Content-Length':    Buffer.byteLength(bodyString),
+      'x-api-key':         apiKey,
+      'anthropic-version': '2023-06-01'
+    }
+  };
+
+  const apiReq = https.request(options, (apiRes) => {
+    let data = '';
+    apiRes.on('data', c => data += c);
+    apiRes.on('end', () => {
+      try { res.status(apiRes.statusCode).json(JSON.parse(data)); }
+      catch(e) { res.status(500).json({ error: { message: 'Layer 2 parse error.' } }); }
+    });
+  });
+
+  apiReq.on('error', () => res.status(502).json({ error: { message: 'Layer 2 request failed.' } }));
+  apiReq.setTimeout(90000, () => { apiReq.destroy(); res.status(504).json({ error: { message: 'Layer 2 timed out.' } }); });
+  apiReq.write(bodyString);
+  apiReq.end();
+});
+
+
+// ── CLARIFY QUESTIONS ENDPOINT ───────────────────────────────────────────────
+app.post('/api/clarify', async (req, res) => {
+
+  const { messages } = req.body;
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: { message: 'Invalid request.' } });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: { message: 'Server configuration error.' } });
+
+  const clarifySysPrompt = `You are the BAS DecisionMine Engine — Third Brain. Your only task right now is to generate exactly 3 sharp, targeted clarifying questions for the idea or decision described by the user.
+
+The questions must:
+- Uncover the single most critical unknown that would change the analysis
+- Be specific to what the user actually described — not generic
+- Be answerable in 1-3 sentences
+- Together cover: the market/customer reality, the resource/execution reality, and the risk/constraint reality
+
+Return ONLY valid JSON. No markdown. No backticks. No explanation. Exactly this structure:
+{
+  "questions": [
+    {"num": 1, "question": "Full question text here"},
+    {"num": 2, "question": "Full question text here"},
+    {"num": 3, "question": "Full question text here"}
+  ]
+}`;
+
+  const bodyString = JSON.stringify({
+    model:      'claude-sonnet-4-20250514',
+    max_tokens: 800,
+    system:     clarifySysPrompt,
+    messages:   messages
+  });
+
+  const options = {
+    hostname: 'api.anthropic.com',
+    path:     '/v1/messages',
+    method:   'POST',
+    headers:  {
+      'Content-Type':      'application/json',
+      'Content-Length':    Buffer.byteLength(bodyString),
+      'x-api-key':         apiKey,
+      'anthropic-version': '2023-06-01'
+    }
+  };
+
+  const apiReq = https.request(options, (apiRes) => {
+    let data = '';
+    apiRes.on('data', chunk => data += chunk);
+    apiRes.on('end', () => {
+      try {
+        const parsed = JSON.parse(data);
+        res.status(apiRes.statusCode).json(parsed);
+      } catch(e) {
+        res.status(500).json({ error: { message: 'Failed to parse clarify response.' } });
+      }
+    });
+  });
+
+  apiReq.on('error', () => res.status(502).json({ error: { message: 'Clarify request failed.' } }));
+  apiReq.setTimeout(30000, () => { apiReq.destroy(); res.status(504).json({ error: { message: 'Clarify timed out.' } }); });
+  apiReq.write(bodyString);
+  apiReq.end();
+});
+
+
 // ── MAIN ANALYSIS ENDPOINT ────────────────────────────────────────────────────
 app.post('/api/analyse', async (req, res) => {
 
