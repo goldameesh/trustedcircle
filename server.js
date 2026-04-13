@@ -40,7 +40,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: '64kb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname)));
 
 
 // ── UPSTASH COUNTER (silent — users never see this) ───────────────────────────
@@ -361,7 +361,7 @@ app.get('/api/admin/counter', async (req, res) => {
 
 // ── SERVE INDEX ───────────────────────────────────────────────────────────────
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 
