@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BAS · DecisionMine Engine — Third Brain™ · Trusted Circle</title>
+<meta name="theme-color" content="#0e1f3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BAS DME">
+<meta name="description" content="BAS DecisionMine Engine — Third Brain™. Decision intelligence for leaders.">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22BAS+DecisionMine+Engine%22%2C%22short_name%22%3A%22BAS+DME%22%2C%22description%22%3A%22Third+Brain+%E2%84%A2+%E2%80%94+Decision+Intelligence+Engine%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230e1f3d%22%2C%22theme_color%22%3A%22%230e1f3d%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg+xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27+viewBox%3D%270+0+512+512%27%253E%253Crect+width%3D%27512%27+height%3D%27512%27+fill%3D%27%230e1f3d%27%2F%253E%253Ctext+x%3D%27256%27+y%3D%27310%27+font-family%3D%27serif%27+font-size%3D%27220%27+fill%3D%27%23c9a227%27+text-anchor%3D%27middle%27%253E%25E2%25AC%25A1%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any+maskable%22%7D%5D%7D">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -430,20 +436,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);o
 }
 
 /* Layer steps */
-.layers-track{display:flex;flex-direction:column;gap:6px;text-align:left}
-.layer-step{
-  display:flex;align-items:center;gap:12px;padding:10px 16px;
-  border-radius:var(--r-sm);border:1px solid rgba(255,255,255,0.05);
-  font-size:13px;color:rgba(255,255,255,0.3);transition:var(--tr);background:rgba(255,255,255,0.02);
+.layers-track{display:none}
+.layer-cell{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  border-radius:6px;padding:8px 4px;text-align:center;
+  font-size:8.5px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.22);
+  transition:all 0.35s ease;line-height:1.3;min-height:54px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
 }
-.layer-step.active{
-  border-color:rgba(201,162,39,0.3);background:rgba(201,162,39,0.06);
-  color:rgba(255,255,255,0.85);font-weight:500;
+.layer-cell-num{font-size:8px;color:rgba(201,162,39,0.28);font-weight:600;letter-spacing:0.5px}
+.layer-cell-name{font-size:8px;color:inherit;line-height:1.25;padding:0 2px}
+.layer-cell.lc-active{
+  background:rgba(201,162,39,0.1);border-color:rgba(201,162,39,0.45);
+  color:rgba(201,162,39,0.9);animation:cellPulse 1.2s ease-in-out infinite;
 }
-.layer-step.done{border-color:rgba(42,82,152,0.2);background:rgba(42,82,152,0.06);color:rgba(255,255,255,0.45)}
-.step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;transition:var(--tr)}
-.layer-step.active .step-dot{background:var(--gold);box-shadow:0 0 8px rgba(201,162,39,0.8);animation:blink 1s infinite}
-.layer-step.done .step-dot{background:var(--blue-lt)}
+.layer-cell.lc-active .layer-cell-num{color:var(--gold)}
+.layer-cell.lc-done{
+  background:rgba(42,82,152,0.1);border-color:rgba(42,82,152,0.22);color:rgba(255,255,255,0.45);
+}
+.layer-cell.lc-done .layer-cell-num{color:rgba(100,140,220,0.5)}
+@keyframes cellPulse{0%,100%{box-shadow:0 0 6px rgba(201,162,39,0.08)}50%{box-shadow:0 0 18px rgba(201,162,39,0.22)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* ════════════════════ CLARIFY VIEW ════════════════════ */
@@ -1464,111 +1476,43 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);o
 </div><!-- /landingView -->
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- HOW IT WORKS PAGE -->
+<!-- HOW IT WORKS PAGE — CLEAN -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="howItWorksPage" style="display:none;min-height:100vh;background:linear-gradient(160deg,#0a1628 0%,#0f2040 60%,#1a3a6b 100%);padding:80px 24px 60px;position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(201,162,39,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,162,39,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none"></div>
-  <div style="position:absolute;top:20%;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse at center,rgba(42,82,152,0.1),transparent);pointer-events:none"></div>
-  <div style="max-width:1060px;margin:0 auto;position:relative;z-index:2">
+  <div style="max-width:800px;margin:0 auto;position:relative;z-index:2">
 
-    <button onclick="hideHowItWorks()" style="margin-bottom:32px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);padding:8px 18px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px">← Back</button>
+    <button onclick="hideHowItWorks()" style="margin-bottom:40px;background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);padding:8px 18px;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(201,162,39,0.4)';this.style.color='rgba(201,162,39,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.4)'">← Back</button>
 
-    <div style="text-align:center;margin-bottom:56px">
-      <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#c9a227;font-weight:600;margin-bottom:12px">◈ Full Transparency</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.1">Inside The Third Brain</h2>
-      <p style="font-size:14px;color:rgba(255,255,255,0.45);font-weight:300">Every analysis runs the same rigorous architecture. Nothing is skipped. Nothing is assumed away.</p>
-    </div>
+    <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:20px">◈ &nbsp;How The Third Brain Works</div>
 
-    <!-- Stats bar -->
-    <div style="display:flex;justify-content:center;gap:0;margin-bottom:56px;border:1px solid rgba(201,162,39,0.15);border-radius:12px;overflow:hidden;max-width:700px;margin-left:auto;margin-right:auto">
-      <div style="flex:1;padding:20px 16px;text-align:center;border-right:1px solid rgba(201,162,39,0.1);background:rgba(255,255,255,0.03)"><span style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#e8c547;display:block;line-height:1">15</span><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Decision Layers</span></div>
-      <div style="flex:1;padding:20px 16px;text-align:center;border-right:1px solid rgba(201,162,39,0.1);background:rgba(255,255,255,0.03)"><span style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#e8c547;display:block;line-height:1">9</span><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Scoring Axes</span></div>
-      <div style="flex:1;padding:20px 16px;text-align:center;border-right:1px solid rgba(201,162,39,0.1);background:rgba(255,255,255,0.03)"><span style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#e8c547;display:block;line-height:1">20</span><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Output Sections</span></div>
-      <div style="flex:1;padding:20px 16px;text-align:center;border-right:1px solid rgba(201,162,39,0.1);background:rgba(255,255,255,0.03)"><span style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#e8c547;display:block;line-height:1">6</span><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Frameworks</span></div>
-      <div style="flex:1;padding:20px 16px;text-align:center;background:rgba(255,255,255,0.03)"><span style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#e8c547;display:block;line-height:1">~850</span><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35)">Pages Research</span></div>
-    </div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,56px);font-weight:300;color:#fff;margin-bottom:32px;line-height:1.15">Every AI answers the question<br>you asked.<br><em style="color:rgba(201,162,39,0.85)">This one examines the decision<br>you didn't know you were making.</em></h2>
 
-    <!-- 15 Layers -->
-    <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:20px;text-align:center">The 15 Decision Layers — Applied To Every Analysis</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:48px">
+    <div style="width:48px;height:1px;background:rgba(201,162,39,0.3);margin-bottom:40px"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:48px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden">
       ${[
-        ['01','Visible Activity Recognition','Names the primary business first — prevents surface blindness and anchoring on the headline output.','Detection','#4a90d9'],
-        ['02','Secondary Output Mapping','Lists everything produced alongside the main activity — materials, friction, support, regulatory exposure.','Detection','#4a90d9'],
-        ['03','Burden Identification','Filters for recurring pain — cost, delay, fatigue, risk, or trust loss that compounds over time.','Detection','#4a90d9'],
-        ['04','Structural Scale Test','Assesses recurrence, volume, spread, persistence. Small issue vs structural burden requiring dedicated response.','Detection','#4a90d9'],
-        ['05','Reclassification','Renames the burden analytically. Waste→feedstock. Complaints→intelligence. Naming changes what becomes thinkable.','Reclassification','#c9a227'],
-        ['06','Dual-Ledger Economics','Maps where the burden appears as cost AND where it appears as income for someone else right now.','Value Logic','#1d9e75'],
-        ['07','Control-Point Mapping','Locates where aggregation, routing, or switching cost creates durable leverage — not just where the pain is.','Value Logic','#1d9e75'],
-        ['08','First-Order Opportunity','The simplest viable intervention. Minimum structure. Start here — not at scale.','Value Logic','#1d9e75'],
-        ['09','Second-Order Value','What becomes visible ONLY after the flow is organised — data patterns, pricing leverage, ecosystem position.','Value Logic','#1d9e75'],
-        ['10','Legal Admissibility','Is it allowed? Ownership, licensing, privacy, environmental, labour — RED gate stops immediately.','Responsibility','#e05252'],
-        ['11','Ethical & Trust Review','Legality ≠ defensibility. Tests opacity, weak consent, unfair risk transfer. Front-page test applied.','Responsibility','#e05252'],
-        ['12','Technical Feasibility','Does it work under REAL conditions — not ideal? Infrastructure, integration, data quality assessed.','Feasibility','#9b59b6'],
-        ['13','Economic Viability','Setup cost, operating cost, payback, willingness to pay, alternatives. Analytical ≠ economic viability.','Feasibility','#9b59b6'],
-        ['14','Operational Implementability','Can real people run this with what they actually have? What breaks first in practice?','Feasibility','#9b59b6'],
-        ['15','Governance & Decision Rights','Owners, metrics, escalation paths, stop conditions. Turns framework into a decision system.','Governance','#3498db'],
-      ].map(([num,name,desc,family,color]) => `
-        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px;position:relative;overflow:hidden">
-          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${color}"></div>
-          <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:6px">${num}</div>
-          <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:6px">${name}</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:8px">${desc}</div>
-          <span style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.5)">${family}</span>
-        </div>`).join('')}
+        ['15','Decision Layers — run simultaneously, every analysis'],
+        ['9','Scoring axes — from feasibility to governance readiness'],
+        ['20','Output sections — from executive summary to action roadmap'],
+        ['6','Research frameworks — Teece, OECD, NIST, ISO, World Bank, EPA'],
+        ['5','Analysis modes — StressTest, ClearDoc, BurdenMine, AdvisoryEdge, Playground'],
+        ['0','Layers skipped — the user cannot skip the uncomfortable ones']
+      ].map(([n,l])=>`<div style="background:rgba(14,31,61,0.8);padding:24px 28px"><div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:#c9a227;line-height:1;margin-bottom:8px">${n}</div><div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;font-weight:300">${l}</div></div>`).join('')}
     </div>
 
-    <!-- 9 Axes -->
-    <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:20px;text-align:center">The 9 Scoring Axes — How Every Idea Is Measured</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:48px">
-      ${[
-        ['🔄','Burden Recurrence','How structurally embedded is this pain? One-time vs constant.'],
-        ['📐','Scale Significance','Large enough to justify a dedicated response?'],
-        ['⚓','Control-Point Access','Can we own a durable interface or leverage point?'],
-        ['🎯','First-Order Clarity','Is the immediate intervention obvious and buildable?'],
-        ['⬡','Second-Order Value','Is additional upside credible after solving first problem?'],
-        ['⚙️','Technical Feasibility','Can it actually work reliably under real conditions?'],
-        ['💰','Economic Viability','Do the unit economics hold? Is the payback real?'],
-        ['🏗️','Operational Feasibility','Can real people run this with what they actually have?'],
-        ['🏛️','Governance Readiness','Clear owners, review cadence, stop conditions defined?'],
-      ].map(([icon,name,desc],i) => `
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;display:flex;align-items:flex-start;gap:10px">
-          <div style="font-size:20px;flex-shrink:0">${icon}</div>
-          <div><div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:4px">${name}</div><div style="font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5">${desc}</div></div>
-        </div>`).join('')}
+    <div style="background:rgba(201,162,39,0.06);border:1px solid rgba(201,162,39,0.12);border-radius:4px;padding:32px;margin-bottom:32px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2vw,22px);font-style:italic;color:rgba(255,255,255,0.8);line-height:1.7;margin-bottom:20px">"The verdict is not designed to replace your judgment. It is designed to tell you whether your judgment has examined everything it needs to."</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);font-family:'DM Mono',monospace;letter-spacing:1px">BAS · DecisionMine Engine — Third Brain™</div>
     </div>
 
-    <!-- Research Foundation -->
-    <div style="background:rgba(201,162,39,0.06);border:1px solid rgba(201,162,39,0.15);border-radius:12px;padding:28px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:8px">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#fff">Research & Intellectual Foundation</div>
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:#c9a227;background:rgba(201,162,39,0.1);padding:4px 12px;border-radius:20px">~850 pages · 6 frameworks</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${[
-          ['Business Model Theory','Teece, D.J. (2010) — Business Models, Business Strategy and Innovation','Value creation vs capture · Business model architecture · Long Range Planning Journal','~32 pages · Core framework','#4a90d9'],
-          ['Activity Systems','Zott & Amit — Business Model Design: An Activity System Perspective','Interconnectedness of activities · Design themes · Strategic advantage structure','~18 pages · Value architecture','#1d9e75'],
-          ['Due Diligence','OECD (2018) — Due Diligence Guidance for Responsible Business Conduct','Adverse impact logic · Materiality thresholds · Stakeholder responsibility mapping','~102 pages · Responsibility layer','#c9a227'],
-          ['Risk Governance','NIST AI Risk Management Framework (AI RMF 1.0, 2023)','Govern-Map-Measure-Manage · Contextual risk assessment · Governance architecture','~64 pages · Governance layer','#9b59b6'],
-          ['Strategy Theory','Casadesus-Masanell & Ricart — From Strategy to Business Models and Tactics','Strategy-model-tactics distinction · Virtuous cycles · HBR publication','~24 pages · Strategic layer','#e05252'],
-          ['Resource Recovery','World Bank · EPA · DOE — Wastewater, Industrial Reuse & Produced Water Research','Reclassification analogies · Treatment economics · Burden-to-resource conversion logic','~610 pages combined · Analogy layer','#3498db'],
-        ].map(([type,title,scope,pages,color]) => `
-          <div style="padding:14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-left:3px solid ${color}">
-            <div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;color:${color};margin-bottom:6px">${type}</div>
-            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:4px;line-height:1.4">${title}</div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;margin-bottom:4px">${scope}</div>
-            <div style="font-size:9px;color:#c9a227;font-family:'DM Mono',monospace">${pages}</div>
-          </div>`).join('')}
-      </div>
-    </div>
-
-    <div style="text-align:center;margin-top:32px;font-size:12px;color:rgba(255,255,255,0.3);line-height:1.7">
-      The Third Brain synthesises these frameworks into a single unified decision architecture.<br>
-      No single framework alone produces the output — the intelligence comes from their integration.<br>
-      <span style="color:#c9a227;font-weight:500">Every analysis runs all 15 layers. Every time. Nothing is skipped.</span>
+    <div style="font-size:12px;color:rgba(255,255,255,0.25);line-height:1.8;font-weight:300">
+      All outputs are AI-generated decision intelligence aids. They do not constitute legal, financial, or investment advice. Validate all consequential decisions with qualified professionals.
     </div>
 
   </div>
 </div>
+
+
 
 <!-- ═══════════════════════════════════════════ -->
 <!-- CLARIFY VIEW -->
@@ -1636,8 +1580,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);o
       </div>
     </div>
 
-    <!-- Layer steps -->
-    <div class="layers-track" id="layersTrack"></div>
+    <!-- Layer Grid — horizontal 4x5 animated -->
+    <div id="layerGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:680px;margin:0 auto 24px;width:100%">
+    </div>
 
     <!-- Bottom assurance -->
     <div id="procAssurance" style="margin-top:28px;padding:14px 20px;border-radius:8px;background:rgba(201,162,39,0.07);border:1px solid rgba(201,162,39,0.15);font-size:12px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto">
@@ -1718,6 +1663,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);o
       <!-- Sector breakdown -->
       <div class="admin-section-title">Top Sectors</div>
       <div id="adminSectors" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px"></div>
+
+      <!-- Session Error Log -->
+      <div class="admin-section-title" style="color:rgba(220,150,150,0.7)">⬡ Session Error Log</div>
+      <div id="adminErrorLog" style="margin-bottom:28px;min-height:32px"></div>
 
       <!-- Tool Recommendation Management -->
       <div class="admin-section-title">⬡ Tool Recommendation Library — Admin Management</div>
@@ -2053,6 +2002,7 @@ let analysisApproach = 'assume';
 let clarifyAnswers = {};
 let analysisHistory = [];
 let currentResult = null;
+let _errorLog = []; // Session error log — viewable via admin overlay
 let capturedIdea = {};
 
 // ── PERSISTENT HISTORY ──
@@ -2356,27 +2306,50 @@ async function runClarifyPhase() {
   document.getElementById('procSubText').textContent = 'Generating clarifying questions...';
   showLayerProgress(3);
 
-  const sysPrompt = `You are the BAS DecisionMine Engine — Third Brain. Generate exactly 3 sharp, targeted clarifying questions for the idea/decision described. Questions must uncover the most critical unknowns that would change the analysis.
-
-Return ONLY valid JSON, no markdown, no explanation:
-{
-  "questions": [
-    {"num": 1, "question": "Full question text here"},
-    {"num": 2, "question": "Full question text here"},
-    {"num": 3, "question": "Full question text here"}
-  ]
-}`;
-
   const userMsg = buildUserMsg(capturedIdea, '');
 
   try {
-    const res = await callAPI(sysPrompt, userMsg, 500);
-    const qs = res.questions || [];
+    // Use dedicated /api/clarify endpoint — not the main analysis endpoint
+    const response = await fetch('/api/clarify', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`Clarify API ${response.status}`);
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || 'Clarify error');
+
+    // Extract text content
+    const contentArray = data.content || [];
+    const rawText = contentArray
+      .filter(c => c.type === 'text')
+      .map(c => c.text || '')
+      .join('');
+
+    // Parse questions JSON
+    const clean = rawText.replace(/```json|```/g, '').trim();
+    const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    const parsed = JSON.parse(clean.substring(s, e + 1));
+    const qs = parsed.questions || [];
+
+    // Log for admin visibility
+    console.log(`[CLARIFY] Generated ${qs.length} questions for idea: "${(capturedIdea.idea||'').substring(0,60)}"`);
+
+    if (qs.length === 0) throw new Error('No questions returned');
+
     setTimeout(() => {
       showView('clarifyView');
       renderClarifyView(qs);
-    }, 1000);
-  } catch(e) {
+    }, 800);
+
+  } catch(err) {
+    // Fallback — log error, skip clarify, go straight to full analysis
+    console.warn('[CLARIFY FALLBACK] Questions failed — proceeding to full analysis. Error:', err.message);
+    _errorLog.push({ type: 'CLARIFY_FAILED', error: err.message, timestamp: new Date().toISOString(), idea: (capturedIdea.idea||'').substring(0,80) });
     clarifyAnswers = {};
     await runFullAnalysis();
   }
@@ -2384,9 +2357,20 @@ Return ONLY valid JSON, no markdown, no explanation:
 
 function renderClarifyView(questions) {
   const container = document.getElementById('clarifyQs');
-  container.innerHTML = questions.map((q,i) => `
+
+  // Guard — should never happen due to fallback, but safety net
+  if (!questions || questions.length === 0) {
+    container.innerHTML = `
+      <div style="padding:20px;background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:14px;line-height:1.6">
+        The engine could not generate clarifying questions for this submission. Click below to proceed directly to the full analysis.
+      </div>`;
+    clarifyAnswers._questions = [];
+    return;
+  }
+
+  container.innerHTML = questions.map((q, i) => `
     <div class="clarify-q">
-      <div class="clarify-q-num">Question ${q.num || i+1} of 3</div>
+      <div class="clarify-q-num">Question ${q.num || i + 1} of ${questions.length}</div>
       <div class="clarify-q-text">${q.question}</div>
       <input class="clarify-input" id="clarify_${i}" placeholder="Your answer (or leave blank to skip)..." />
     </div>
@@ -2446,9 +2430,39 @@ async function runFullAnalysis() {
     }, 600);
 
   } catch(err) {
+    // Log error for admin review
+    _errorLog.push({
+      type:      'ANALYSIS_FAILED',
+      error:     err.message,
+      timestamp: new Date().toISOString(),
+      idea:      (capturedIdea.idea || '').substring(0, 80),
+      mode:      capturedIdea.mode || 'unknown'
+    });
+    console.error('[ANALYSIS ERROR]', err.message);
+
+    // Show friendly error — not a raw API dump
     showView('landingView');
     document.getElementById('analyzeBtn').disabled = false;
-    alert('Analysis error: ' + err.message + '\n\nIf this persists, check the browser console for details.');
+
+    const friendlyMsg = err.message.includes('405') || err.message.includes('401') || err.message.includes('403')
+      ? 'The engine could not authenticate. Please check your API key is correctly set in Render Environment Variables, then redeploy.'
+      : err.message.includes('429')
+      ? 'The Trusted Circle engine has reached its current testing capacity. Please contact amish@bhramaastraadvisory.com to continue.'
+      : err.message.includes('504') || err.message.includes('timeout')
+      ? 'The analysis timed out — this can happen with very complex submissions. Please try again.'
+      : 'The engine encountered an issue processing this submission. Please try again. If it persists, contact amish@bhramaastraadvisory.com.';
+
+    // Show non-intrusive error banner instead of alert
+    let errBanner = document.getElementById('engineErrorBanner');
+    if (!errBanner) {
+      errBanner = document.createElement('div');
+      errBanner.id = 'engineErrorBanner';
+      errBanner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a0a0a;border:1px solid rgba(220,80,80,0.3);color:rgba(255,180,180,0.85);padding:14px 24px;border-radius:8px;font-size:13px;max-width:520px;text-align:center;z-index:9999;line-height:1.5;box-shadow:0 8px 32px rgba(0,0,0,0.4)';
+      document.body.appendChild(errBanner);
+    }
+    errBanner.textContent = friendlyMsg;
+    errBanner.style.display = 'block';
+    setTimeout(() => { if (errBanner) errBanner.style.display = 'none'; }, 8000);
   }
 }
 
@@ -2512,14 +2526,22 @@ async function callAPI(systemPrompt, userMsg, maxTokens, useWebSearch) {
 
   if (!response.ok) {
     const errBody = await response.text().catch(() => '');
-    throw new Error(`API ${response.status}: ${errBody.substring(0,200)}`);
+    const errMsg = `API ${response.status}: ${errBody.substring(0,200)}`;
+    _errorLog.push({ type: 'API_ERROR', error: errMsg, timestamp: new Date().toISOString(), mode, location });
+    console.error('[API ERROR]', errMsg);
+    throw new Error(errMsg);
   }
   const data = await response.json();
 
-  console.log('API response structure:', JSON.stringify(data).substring(0, 300));
+  if (process?.env?.NODE_ENV !== 'production') {
+    console.log('[API] Response structure:', JSON.stringify(data).substring(0, 300));
+  }
 
   if (data.error) {
-    throw new Error('API returned error: ' + (data.error.message || JSON.stringify(data.error)));
+    const errMsg = 'API returned error: ' + (data.error.message || JSON.stringify(data.error));
+    _errorLog.push({ type: 'API_RETURNED_ERROR', error: errMsg, timestamp: new Date().toISOString() });
+    console.error('[API RETURNED ERROR]', errMsg);
+    throw new Error(errMsg);
   }
 
   // Handle multi-block responses (text + tool_use + tool_result blocks)
@@ -2700,18 +2722,34 @@ let _procTimerInterval = null;
 let _procStartTime = null;
 
 function showLayerProgress(count) {
+  // Build horizontal 4×5 (or 3×4) grid — no vertical overflow
+  const grid = document.getElementById('layerGrid');
   const track = document.getElementById('layersTrack');
-  track.innerHTML = '';
+  if (track) track.innerHTML = '';
+  if (!grid) return;
+  grid.innerHTML = '';
+
   const steps = LAYER_STEPS.slice(0, count);
   const isFullRun = count === 20;
   const estTotalMs = isFullRun ? 90000 : 20000;
 
+  // Short labels for grid cells (max 2 lines)
+  const shortLabels = [
+    'Visible Activity','Hidden Burdens','Scale Test','Burden Type',
+    'Dual-Ledger','Control Points','First-Order','Second-Order',
+    'Legal Gate','Ethics Gate','Technical','Economics',
+    'Operations','Governance','Stakeholders','Time Horizon',
+    'Scorecard','Verdict','Action Map','Final Report'
+  ];
+
   steps.forEach((step, i) => {
-    const div = document.createElement('div');
-    div.className = 'layer-step';
-    div.id = `lstep_${i}`;
-    div.innerHTML = `<div class="step-dot"></div><span>${step}</span>`;
-    track.appendChild(div);
+    const cell = document.createElement('div');
+    cell.className = 'layer-cell';
+    cell.id = `lcell_${i}`;
+    const num = String(i + 1).padStart(2, '0');
+    const label = shortLabels[i] || step.replace(/^\d+\s·\s/, '').substring(0, 18);
+    cell.innerHTML = `<div class="layer-cell-num">${num}</div><div class="layer-cell-name">${label}</div>`;
+    grid.appendChild(cell);
   });
 
   // Start elapsed timer
@@ -2728,33 +2766,29 @@ function showLayerProgress(count) {
   let i = 0;
   function next() {
     if (i > 0) {
-      const p = document.getElementById(`lstep_${i-1}`);
-      if (p) { p.classList.remove('active'); p.classList.add('done'); }
+      const p = document.getElementById(`lcell_${i-1}`);
+      if (p) { p.classList.remove('lc-active'); p.classList.add('lc-done'); }
     }
 
     if (i < steps.length) {
-      const c = document.getElementById(`lstep_${i}`);
-      if (c) {
-        c.classList.add('active');
-        c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+      const c = document.getElementById(`lcell_${i}`);
+      if (c) c.classList.add('lc-active');
 
       // Update progress %
       const pct = Math.round(((i + 1) / steps.length) * 100);
-      const bar = document.getElementById('procBar');
-      const pctEl = document.getElementById('procPct');
-      const layerEl = document.getElementById('procLayerCount');
-      const etaEl = document.getElementById('procETA');
-      const subEl = document.getElementById('procSubText');
-      const titleEl = document.getElementById('procTitle');
-      const assurEl = document.getElementById('procAssurance');
+      const bar    = document.getElementById('procBar');
+      const pctEl  = document.getElementById('procPct');
+      const layerEl= document.getElementById('procLayerCount');
+      const etaEl  = document.getElementById('procETA');
+      const subEl  = document.getElementById('procSubText');
+      const titleEl= document.getElementById('procTitle');
+      const assurEl= document.getElementById('procAssurance');
 
-      if (bar) bar.style.width = pct + '%';
-      if (pctEl) pctEl.textContent = pct + '%';
-      if (layerEl) layerEl.textContent = (i+1) + '/' + steps.length;
+      if (bar)    bar.style.width = pct + '%';
+      if (pctEl)  pctEl.textContent = pct + '%';
+      if (layerEl)layerEl.textContent = (i+1) + '/' + steps.length;
       if (subEl && PROC_STATUS_MSGS[i]) subEl.textContent = PROC_STATUS_MSGS[i];
 
-      // ETA countdown
       if (etaEl) {
         const elapsed = Date.now() - _procStartTime;
         const estimatedTotal = isFullRun ? Math.max(estTotalMs, elapsed * (steps.length / (i+1))) : estTotalMs;
@@ -2764,40 +2798,97 @@ function showLayerProgress(count) {
         else etaEl.textContent = 'Soon';
       }
 
-      // Title changes at key milestones
       if (titleEl) {
-        if (pct < 30) titleEl.textContent = 'Third Brain Activated';
-        else if (pct < 60) titleEl.textContent = 'Deep Analysis Underway';
-        else if (pct < 85) titleEl.textContent = 'Building Your Intelligence Report';
-        else titleEl.textContent = 'Almost Ready — Finalising...';
+        if (pct < 30)       titleEl.textContent = 'Third Brain Activated';
+        else if (pct < 60)  titleEl.textContent = 'Deep Analysis Underway';
+        else if (pct < 85)  titleEl.textContent = 'Building Your Intelligence Report';
+        else                titleEl.textContent = 'Almost Ready — Finalising...';
       }
 
-      // Assurance message changes near end
       if (assurEl && pct >= 85) {
         assurEl.style.background = 'rgba(29,158,117,0.08)';
         assurEl.style.borderColor = 'rgba(29,158,117,0.2)';
-        assurEl.innerHTML = '✓ &nbsp;Analysis complete. Rendering your 20-section intelligence report now...';
+        assurEl.innerHTML = '✓ &nbsp;Analysis complete. Rendering your intelligence report now...';
       }
 
       i++;
-      setTimeout(next, 650 + Math.random() * 350);
+      setTimeout(next, 640 + Math.random() * 360);
     } else {
-      // All steps done — clear timer
       if (_procTimerInterval) { clearInterval(_procTimerInterval); _procTimerInterval = null; }
       const pctEl = document.getElementById('procPct');
-      const bar = document.getElementById('procBar');
+      const bar   = document.getElementById('procBar');
       if (pctEl) pctEl.textContent = '100%';
-      if (bar) bar.style.width = '100%';
+      if (bar)   bar.style.width = '100%';
     }
   }
   next();
 }
 
 // ── RENDER OUTPUT ──
+function generateReportId() {
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const mo  = String(now.getMonth()+1).padStart(2,'0');
+  const dy  = String(now.getDate()).padStart(2,'0');
+  const hr  = String(now.getHours()).padStart(2,'0');
+  const mn  = String(now.getMinutes()).padStart(2,'0');
+  return `TC-${yr}${mo}${dy}-${hr}${mn}`;
+}
+
 function renderOutput(r) {
+  // Generate report ID if not already set
+  if (!r.reportId) r.reportId = generateReportId();
+
   document.getElementById('outModeLabel').textContent = MODE_LABELS[r.mode] || 'ANALYSIS';
-  document.getElementById('outTitle').textContent = (r.headline || 'Analysis Complete').replace(/^(STRESS TEST:|DECISION MEMO:|BURDEN ANALYSIS:|ADVISORY BRIEF:)\s*/i,'');
-  document.getElementById('outMeta').textContent = `BAS · Third Brain™ · ${r.timestamp}${r.sector ? ' · ' + r.sector : ''}${r.orgType ? ' · ' + r.orgType : ''}`;
+  document.getElementById('outTitle').textContent = (r.headline || 'Analysis Complete').replace(/^(STRESS TEST:|DECISION MEMO:|BURDEN ANALYSIS:|ADVISORY BRIEF:|IDEA CHECK:)\s*/i,'');
+
+  // Rich meta line — name, org, ref, timestamp
+  const namePart = r.userName ? `Prepared for ${r.userName}` : '';
+  const orgPart  = r.orgName  ? `· ${r.orgName}` : '';
+  const refPart  = `· Ref ${r.reportId}`;
+  const timePart = `· ${r.timestamp}`;
+  const secPart  = r.sector   ? `· ${r.sector}` : '';
+  document.getElementById('outMeta').textContent = [namePart, orgPart, refPart, timePart, secPart].filter(Boolean).join(' ');
+
+  // Report stamp banner — prominent identity block at top
+  let stampEl = document.getElementById('reportStamp');
+  if (!stampEl) {
+    stampEl = document.createElement('div');
+    stampEl.id = 'reportStamp';
+    stampEl.style.cssText = 'background:rgba(14,31,61,0.6);border:1px solid rgba(201,162,39,0.1);border-radius:6px;padding:12px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px';
+    const topBar = document.getElementById('outputView')?.querySelector('.output-topbar');
+    if (topBar) topBar.parentNode.insertBefore(stampEl, topBar);
+  }
+  const modeColor = {stresstest:'#e05252',cleardoc:'#3a6bc4',burdenmine:'#1d9e75',advisoryedge:'#c9a227',playground:'#9b59b6'};
+  stampEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(201,162,39,0.6);letter-spacing:1px">${r.reportId}</div>
+      <div style="width:1px;height:12px;background:rgba(255,255,255,0.1)"></div>
+      <div style="font-size:10px;font-weight:600;color:${modeColor[r.mode]||'#c9a227'};letter-spacing:0.5px;text-transform:uppercase">${(r.mode||'stresstest').toUpperCase()} MODE</div>
+      ${r.sector ? `<div style="width:1px;height:12px;background:rgba(255,255,255,0.1)"></div><div style="font-size:10px;color:rgba(255,255,255,0.3)">${r.sector}</div>` : ''}
+    </div>
+    <div style="text-align:right">
+      ${r.userName ? `<div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:500">${r.userName}${r.orgName ? ' · ' + r.orgName : ''}</div>` : ''}
+      <div style="font-size:10px;color:rgba(255,255,255,0.25);font-family:'DM Mono',monospace">${r.timestamp}</div>
+    </div>`;
+
+  // LocalStorage notice — Option A transparency
+  if (!localStorage.getItem('bas_storage_notice_seen')) {
+    let notice = document.getElementById('storageNotice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'storageNotice';
+      notice.style.cssText = 'background:rgba(201,162,39,0.06);border:1px solid rgba(201,162,39,0.12);border-radius:6px;padding:10px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:12px';
+      notice.innerHTML = `
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5;flex:1">
+          <strong style="color:rgba(255,255,255,0.6)">Your analyses are stored in this browser only.</strong>
+          They are not sent to any server. Clearing your browser cache will remove them.
+          Export PDF to keep a permanent copy.
+        </div>
+        <button onclick="localStorage.setItem('bas_storage_notice_seen','1');this.parentNode.remove()" style="background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:18px;padding:0;line-height:1;flex-shrink:0">✕</button>`;
+      if (stampEl.parentNode) stampEl.parentNode.insertBefore(notice, stampEl);
+    }
+  }
 
   // Stop alert
   const stop = r.legalGate === 'RED' || r.ethicsGate === 'RED';
@@ -3725,62 +3816,252 @@ function renderLayer2Panel(result) {
 
 async function activateLayer2(path) {
   if (!currentResult) return;
-  const pathPrompts = {
-    vision: 'LAYER 2 — REAL VISION: Map the 3-5 year opportunity if everything works. Include market sizing, strategic positioning, competitive moat, funding potential, and what this could become at scale. Be specific to the location and sector provided.',
-    execution: 'LAYER 2 — REAL EXECUTION: Provide a complete 90-day execution plan. Include: minimum viable team (roles + rough cost), capital required to start, specific regulations to comply with (location-specific with URLs), local accelerators/resources/connections relevant to this idea, and exact Week 1, Month 1, Month 3 action steps.',
-    redesign: 'LAYER 2 — REDESIGN BLUEPRINT: Based on the issues found in Layer 1, provide a specific redesign plan. What exactly needs to change? What is the pivot? What does the redesigned model look like and does it pass the same 15 layers?',
-    adjacent: 'LAYER 2 — ADJACENT OPPORTUNITY: Identify 2-3 nearby ideas that use similar skills/resources but avoid the blockers found. For each: what is it, why it avoids the issues, what it requires, and initial viability assessment.',
-    deepdive: 'LAYER 2 — DEEP DIVE ON BLOCKERS: For each blocker identified, explain exactly what would need to change — what regulation would need to shift, what market conditions, what team, what capital — and assign a realistic timeline to each.',
-  };
 
   document.getElementById('layer2Panel').style.display = 'none';
   showView('processingView');
-  document.getElementById('procTitle').textContent = 'Layer 2 Intelligence Activated';
-  document.getElementById('procSubText').textContent = 'Building your deep execution intelligence...';
-  showLayerProgress(20);
+  const titleEl = document.getElementById('procTitle');
+  const subEl   = document.getElementById('procSubText');
+  if (titleEl) titleEl.textContent = path === 'vision' ? 'Building Real Vision Brief' : path === 'execution' ? 'Building Execution Blueprint' : 'Deep Layer 2 Intelligence';
+  if (subEl)   subEl.textContent   = 'Applying global advisory intelligence — deeper pass, different output...';
+  showLayerProgress(path === 'vision' || path === 'execution' ? 8 : 6);
   setTimeout(startInsightRotation, 1200);
 
-  const layer2Data = {
-    ...capturedIdea,
-    userName: document.getElementById('userName')?.value?.trim() || '',
-    orgName: document.getElementById('orgName')?.value?.trim() || '',
-    userLocation: document.getElementById('userLocation')?.value?.trim() || '',
-    freeText: (capturedIdea.freeText || '') + `\n\nLAYER 1 VERDICT: ${currentResult.verdict}\nLAYER 1 HEADLINE: ${currentResult.headline}\n${pathPrompts[path]}`,
-  };
+  // Build focused context message from original analysis — not a repeat
+  const orig = currentResult;
+  const userMsg = `ORIGINAL ANALYSIS REFERENCE (${orig.reportId || orig.timestamp}):
+Idea: ${orig.idea || ''}
+Sector: ${orig.sector || 'Not specified'}
+Location: ${orig.location || 'Not specified'}
+Original Verdict: ${orig.verdict || 'CAUTION'}
+Verdict Reason: ${orig.verdictReason || ''}
+Primary Risk: ${(orig.synSegments||{}).primaryRisk || ''}
+Hidden Opportunity: ${(orig.synSegments||{}).hiddenOpportunity || ''}
+Financial Picture: ${(orig.synSegments||{}).financialPicture || ''}
+Strategic Position: ${(orig.synSegments||{}).strategicPosition || ''}
+Additional Context: ${orig.freeText || ''}
+User: ${orig.userName || ''}
+Organisation: ${orig.orgName || ''}
+
+Build the Layer 2 brief using this as foundation. Do NOT repeat the Layer 1 analysis.`.trim();
 
   try {
-    const userMsg = buildUserMsg(layer2Data, '');
-    const result = await callAPI(buildSystemPrompt(), userMsg, 8000);
-    result.idea = capturedIdea.idea + ' [Layer 2]';
-    result.mode = 'playground';
-    result.sector = capturedIdea.sector || '';
-    result.orgType = capturedIdea.orgType || '';
-    result.status = 'Exploring';
-    result.timestamp = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) + ' (L2)';
-    analysisHistory.push(result);
-    savePersistentHistory();
-    currentResult = result;
-    renderHistory();
+    const response = await fetch('/api/layer2', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        messages:        [{ role: 'user', content: userMsg }],
+        path,
+        location:        orig.location  || '',
+        originalVerdict: orig.verdict   || '',
+        originalIdea:    orig.idea      || '',
+        userName:        orig.userName  || '',
+        orgName:         orig.orgName   || ''
+      })
+    });
+
+    if (!response.ok) throw new Error(`Layer 2 API ${response.status}`);
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const rawText = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
+    const clean   = rawText.replace(/```json|```/g, '').trim();
+    const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+    const l2 = JSON.parse(clean.substring(s, e + 1));
+
     setTimeout(() => {
       if (_procTimerInterval) { clearInterval(_procTimerInterval); _procTimerInterval = null; }
       stopInsightRotation();
       showView('outputView');
-      renderOutput(result);
-    }, 600);
+      renderLayer2Brief(l2, orig, path);
+    }, 500);
+
   } catch(err) {
+    _errorLog.push({ type: 'LAYER2_FAILED', error: err.message, path, timestamp: new Date().toISOString() });
+    console.error('[LAYER2 ERROR]', err.message);
+    if (_procTimerInterval) { clearInterval(_procTimerInterval); _procTimerInterval = null; }
+    stopInsightRotation();
     showView('outputView');
-    alert('Layer 2 error: ' + err.message);
+    const errBanner = document.createElement('div');
+    errBanner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a0a0a;border:1px solid rgba(220,80,80,0.3);color:rgba(255,180,180,0.85);padding:14px 24px;border-radius:8px;font-size:13px;max-width:480px;text-align:center;z-index:9999;line-height:1.5';
+    errBanner.textContent = 'Layer 2 brief could not be generated. Please try again.';
+    document.body.appendChild(errBanner);
+    setTimeout(() => errBanner.remove(), 6000);
   }
 }
 
 // ── SYSTEM PROMPT — MOVED TO SERVER.JS ──
-// All proprietary framework logic, wisdom layers, and mode instructions
-// live in server.js only. This function is a no-op stub kept for
-// call-site compatibility. The server builds the real prompt.
 function buildSystemPrompt() { return ''; }
-function buildSystemPromptForMode(mode) {
-  capturedIdea.mode = mode;
-  return '';
+function buildSystemPromptForMode(mode) { capturedIdea.mode = mode; return ''; }
+
+// ── LAYER 2 STRATEGIC BRIEF RENDERER ──
+// Completely different visual from Layer 1 — lean, direct, slide-deck structure
+function renderLayer2Brief(l2, orig, path) {
+  const outputView = document.getElementById('outputView');
+  if (!outputView) return;
+
+  const pathLabels = {
+    vision:    { title: 'Real Vision', icon: '🔭', sub: '3–5 Year Strategic Opportunity' },
+    execution: { title: 'Execution Blueprint', icon: '⚙️', sub: '90-Day Action Plan' },
+    redesign:  { title: 'Redesign Blueprint', icon: '↺', sub: 'Structural Rebuild' },
+    adjacent:  { title: 'Adjacent Opportunities', icon: '◈', sub: 'Lateral Strategic Options' },
+    deepdive:  { title: 'Blocker Deep Dive', icon: '🔬', sub: 'Forensic Analysis' }
+  };
+  const pl = pathLabels[path] || pathLabels.vision;
+  const refId = orig.reportId || orig.timestamp || '';
+  const now   = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const userName = orig.userName || '';
+  const orgName  = orig.orgName  || '';
+
+  // Build brief HTML
+  let html = `
+  <!-- Layer 2 Brief — strategic slide-deck format -->
+  <div id="l2BriefWrap" style="max-width:820px;margin:0 auto;padding:0 0 60px">
+
+    <!-- Context bridge — links back to original -->
+    <div style="background:rgba(42,82,152,0.1);border:1px solid rgba(42,82,152,0.2);border-radius:6px;padding:12px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6">
+        <span style="color:rgba(100,140,220,0.7);font-weight:600">Layer 2 — ${pl.title}</span>
+        &nbsp;·&nbsp; Built on your analysis of <em style="color:rgba(255,255,255,0.6)">"${(orig.idea||'').substring(0,60)}${orig.idea?.length>60?'...':''}"</em>
+        &nbsp;·&nbsp; Original verdict: <span style="font-weight:600;color:${orig.verdict==='GO'?'#1d9e75':orig.verdict==='STOP'?'#c83232':'#c9a227'}">${orig.verdict||'CAUTION'}</span>
+        &nbsp;·&nbsp; Ref ${refId}
+      </div>
+      <button onclick="showLayer2Panel()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;transition:all 0.2s" onmouseover="this.style.borderColor='rgba(201,162,39,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">← Back to Options</button>
+    </div>
+
+    <!-- Brief header -->
+    <div style="background:linear-gradient(135deg,rgba(14,31,61,0.9),rgba(26,58,107,0.5));border:1px solid rgba(201,162,39,0.15);border-radius:8px;padding:36px 40px;margin-bottom:3px">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:12px">◈ &nbsp;BAS · DecisionMine Engine · Third Brain™ · Layer 2</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+        <div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,44px);font-weight:400;color:#fff;line-height:1.1;margin-bottom:6px">${pl.icon} &nbsp;${pl.title}</h2>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);font-style:italic">${pl.sub}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          ${userName ? `<div style="font-size:12px;color:rgba(255,255,255,0.6);font-weight:500">${userName}${orgName ? ' · ' + orgName : ''}</div>` : ''}
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);font-family:'DM Mono',monospace;margin-top:4px">${now}</div>
+        </div>
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px"></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.6">
+        This brief is focused exclusively on <strong style="color:rgba(255,255,255,0.5)">${pl.sub.toLowerCase()}</strong>. It does not repeat the Layer 1 analysis. Read it as a standalone strategic document.
+      </div>
+    </div>`;
+
+  // Vision brief render
+  if (path === 'vision' && l2.visionStatement) {
+    html += `
+    <div style="background:rgba(14,31,61,0.7);border:1px solid rgba(201,162,39,0.1);border-radius:0 0 8px 8px;padding:36px 40px;margin-bottom:3px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,24px);font-style:italic;color:rgba(255,255,255,0.85);line-height:1.7;border-left:2px solid rgba(201,162,39,0.4);padding-left:24px;margin-bottom:32px">${l2.visionStatement}</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        ${l2.marketOpportunity ? `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:10px">Market Opportunity</div><div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7">${l2.marketOpportunity}</div></div>` : ''}
+        ${l2.competitiveMoat ? `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:10px">Competitive Moat</div><div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7">${l2.competitiveMoat}</div></div>` : ''}
+      </div>
+
+      ${l2.theOneBet ? `<div style="background:linear-gradient(135deg,rgba(201,162,39,0.08),rgba(26,58,107,0.3));border:1px solid rgba(201,162,39,0.18);border-radius:6px;padding:24px;margin-bottom:16px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.6);font-family:'DM Mono',monospace;margin-bottom:10px">◈ The One Strategic Bet</div><div style="font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2.2vw,22px);color:#fff;line-height:1.5">${l2.theOneBet}</div></div>` : ''}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        ${l2.scenarioBestCase ? `<div style="background:rgba(29,158,117,0.06);border:1px solid rgba(29,158,117,0.15);border-radius:6px;padding:18px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(29,158,117,0.6);font-family:'DM Mono',monospace;margin-bottom:8px">Best Case · Year 3</div><div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.65">${l2.scenarioBestCase}</div></div>` : ''}
+        ${l2.scenarioRiskCase ? `<div style="background:rgba(200,50,50,0.06);border:1px solid rgba(200,50,50,0.15);border-radius:6px;padding:18px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,100,100,0.6);font-family:'DM Mono',monospace;margin-bottom:8px">Risk Case</div><div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.65">${l2.scenarioRiskCase}</div></div>` : ''}
+      </div>
+
+      ${l2.entryPoint ? `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:20px;margin-bottom:16px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:10px">Entry Point — Where to Start</div><div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7">${l2.entryPoint}</div></div>` : ''}
+
+      ${l2.advisorNote ? `<div style="background:rgba(255,255,255,0.02);border-left:2px solid rgba(201,162,39,0.35);padding:16px 20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.45);font-family:'DM Mono',monospace;margin-bottom:8px">◈ Advisor's Note</div><div style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;font-style:italic">${l2.advisorNote}</div></div>` : ''}
+    </div>`;
+  }
+
+  // Execution brief render
+  if (path === 'execution' && (l2.week1 || l2.teamArchitecture || l2.legalPath)) {
+    const ta = l2.teamArchitecture || {};
+    const cap = l2.capitalRequired  || {};
+    const lp  = l2.legalPath        || {};
+    const resources = Array.isArray(l2.localResources) ? l2.localResources : [];
+
+    html += `
+    <div style="background:rgba(14,31,61,0.7);border:1px solid rgba(201,162,39,0.1);border-radius:0 0 8px 8px;padding:36px 40px;margin-bottom:3px">
+
+      ${l2.thirtyDayFocus ? `<div style="background:linear-gradient(135deg,rgba(201,162,39,0.1),rgba(26,58,107,0.3));border:1px solid rgba(201,162,39,0.2);border-radius:6px;padding:24px;margin-bottom:28px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.6);font-family:'DM Mono',monospace;margin-bottom:10px">◈ 30-Day Single Focus</div><div style="font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2vw,21px);color:#fff;line-height:1.5">${l2.thirtyDayFocus}</div></div>` : ''}
+
+      ${Array.isArray(l2.week1) && l2.week1.length ? `
+      <div style="margin-bottom:24px">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:14px">Week 1 — Specific Actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${l2.week1.map((w,i) => `<div style="display:flex;gap:14px;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:5px"><span style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(201,162,39,0.4);padding-top:1px;flex-shrink:0">${String(i+1).padStart(2,'0')}</span><span style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.6">${w}</span></div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      ${l2.month1Sprint ? `<div style="background:rgba(42,82,152,0.08);border:1px solid rgba(42,82,152,0.15);border-radius:6px;padding:20px;margin-bottom:24px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(100,140,220,0.6);font-family:'DM Mono',monospace;margin-bottom:10px">Month 1 — What Exists at the End</div><div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7">${l2.month1Sprint}</div></div>` : ''}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        ${Object.keys(ta).length ? `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:12px">Team Architecture</div>${ta.critical ? `<div style="margin-bottom:10px"><div style="font-size:10px;color:rgba(100,200,120,0.6);margin-bottom:4px;font-weight:600">Critical First Hire</div><div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6">${ta.critical}</div></div>` : ''}${ta.month3Add ? `<div style="margin-bottom:10px"><div style="font-size:10px;color:rgba(201,162,39,0.5);margin-bottom:4px">Month 3 Addition</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6">${ta.month3Add}</div></div>` : ''}${ta.avoid ? `<div><div style="font-size:10px;color:rgba(200,80,80,0.5);margin-bottom:4px">Hire to Avoid</div><div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6">${ta.avoid}</div></div>` : ''}</div>` : ''}
+        ${Object.keys(cap).length ? `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:12px">Capital Required</div>${cap.minimum ? `<div style="margin-bottom:8px"><div style="font-size:10px;color:rgba(201,162,39,0.5);margin-bottom:3px">Minimum to First Proof</div><div style="font-size:13px;color:#fff;font-weight:500">${cap.minimum}</div></div>` : ''}${cap.comfortable ? `<div style="margin-bottom:8px"><div style="font-size:10px;color:rgba(100,200,120,0.5);margin-bottom:3px">Comfortable Runway</div><div style="font-size:13px;color:#fff;font-weight:500">${cap.comfortable}</div></div>` : ''}${cap.raise ? `<div><div style="font-size:10px;color:rgba(100,140,220,0.5);margin-bottom:3px">If Raising</div><div style="font-size:12px;color:rgba(255,255,255,0.6)">${cap.raise}</div></div>` : ''}</div>` : ''}
+      </div>
+
+      ${Object.keys(lp).length ? `<div style="background:rgba(200,50,50,0.05);border:1px solid rgba(200,50,50,0.12);border-radius:6px;padding:20px;margin-bottom:24px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,100,100,0.6);font-family:'DM Mono',monospace;margin-bottom:14px">Legal & Regulatory Path</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${lp.entityType ? `<div><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">Entity Type</div><div style="font-size:12px;color:rgba(255,255,255,0.65)">${lp.entityType}</div></div>` : ''}${lp.regulator ? `<div><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">Primary Regulator</div><div style="font-size:12px;color:rgba(255,255,255,0.65)">${lp.regulator}</div></div>` : ''}${lp.firstLegalStep ? `<div style="grid-column:span 2"><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">First Legal Step</div><div style="font-size:12px;color:rgba(255,255,255,0.65)">${lp.firstLegalStep}</div></div>` : ''}${lp.timeline ? `<div><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">Timeline to Operational</div><div style="font-size:12px;color:rgba(255,255,255,0.65)">${lp.timeline}</div></div>` : ''}</div></div>` : ''}
+
+      ${resources.length ? `<div style="margin-bottom:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:12px">Local Resources${orig.location ? ' — ' + orig.location : ''}</div><div style="display:flex;flex-direction:column;gap:8px">${resources.map(r => `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:5px"><div style="flex:1"><div style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:2px">${r.name || ''}</div><div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5">${r.what || ''} — ${r.relevance || ''}</div></div>${r.url ? `<a href="https://${r.url.replace(/^https?:\/\//,'')}" target="_blank" style="font-size:10px;color:rgba(201,162,39,0.6);font-family:'DM Mono',monospace;flex-shrink:0;text-decoration:none;border:1px solid rgba(201,162,39,0.2);padding:3px 8px;border-radius:3px">↗ Visit</a>` : ''}</div>`).join('')}</div></div>` : `<div style="padding:16px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:5px;font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:20px">Location-specific resources could not be retrieved for this analysis. We recommend consulting a local advisor or accelerator for on-the-ground intelligence in ${orig.location || 'your market'}.</div>`}
+
+      ${l2.honestWarning ? `<div style="background:rgba(255,255,255,0.02);border-left:2px solid rgba(200,80,80,0.4);padding:16px 20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,100,100,0.5);font-family:'DM Mono',monospace;margin-bottom:8px">⚠ Execution Warning</div><div style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7">${l2.honestWarning}</div></div>` : ''}
+    </div>`;
+  }
+
+  // Generic render for redesign/adjacent/deepdive
+  if (['redesign','adjacent','deepdive'].includes(path)) {
+    const entries = Object.entries(l2).filter(([k]) => k !== 'type');
+    html += `<div style="background:rgba(14,31,61,0.7);border:1px solid rgba(201,162,39,0.1);border-radius:0 0 8px 8px;padding:36px 40px">`;
+    entries.forEach(([key, val]) => {
+      const label = key.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase());
+      if (Array.isArray(val) && val.length) {
+        html += `<div style="margin-bottom:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:10px">${label}</div>`;
+        val.forEach(item => {
+          if (typeof item === 'object') {
+            html += `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:16px;margin-bottom:8px">${Object.entries(item).map(([k2,v2])=>`<div style="margin-bottom:6px"><span style="font-size:10px;color:rgba(201,162,39,0.4);text-transform:capitalize">${k2}: </span><span style="font-size:12px;color:rgba(255,255,255,0.65)">${v2}</span></div>`).join('')}</div>`;
+          } else {
+            html += `<div style="padding:10px 14px;background:rgba(255,255,255,0.02);border-left:2px solid rgba(201,162,39,0.2);margin-bottom:6px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6">${item}</div>`;
+          }
+        });
+        html += `</div>`;
+      } else if (typeof val === 'string') {
+        html += `<div style="margin-bottom:20px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,162,39,0.5);font-family:'DM Mono',monospace;margin-bottom:10px">${label}</div><div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.7">${val}</div></div>`;
+      }
+    });
+    html += `</div>`;
+  }
+
+  // Footer
+  html += `
+    <div style="margin-top:16px;padding:14px 0;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="font-size:10px;color:rgba(255,255,255,0.2);font-family:'DM Mono',monospace">BAS · DecisionMine Engine · Third Brain™ · ${now}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.15)">Layer 2 builds on Ref ${refId} — not a replacement for Layer 1 analysis</div>
+    </div>
+  </div>`;
+
+  // Replace outputView content with brief
+  outputView.innerHTML = `
+    <div class="output-topbar" style="max-width:820px;margin:0 auto 20px;padding:0">
+      <div>
+        <div class="output-mode-label">LAYER 2 · ${pl.title.toUpperCase()}</div>
+        <div class="output-title">${pl.sub}</div>
+      </div>
+      <div class="export-row">
+        <button class="export-btn" onclick="showLayer2Panel()">← Layer 1 Options</button>
+        <button class="export-btn" onclick="resetToInput()">+ New Analysis</button>
+        <button class="export-btn" onclick="window.print()">⬇ Print Brief</button>
+      </div>
+    </div>
+    ${html}`;
+
+  window.scrollTo(0,0);
+}
+
+function showLayer2Panel() {
+  const panel = document.getElementById('layer2Panel');
+  if (panel) {
+    renderLayer2Panel(currentResult);
+    panel.style.display = 'block';
+    panel.scrollIntoView({behavior:'smooth'});
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -3953,28 +4234,74 @@ function scoreToolFit(tool, result) {
 }
 
 function selectTools(result) {
+  const loc = (result.location || '').toLowerCase();
+  const isUAE    = loc.includes('uae') || loc.includes('dubai') || loc.includes('sharjah') || loc.includes('abu dhabi') || loc.includes('emirates');
+  const isIndia  = loc.includes('india') || loc.includes('mumbai') || loc.includes('delhi') || loc.includes('bangalore');
+  const isUS     = loc.includes('usa') || loc.includes('united states') || loc.includes('new york') || loc.includes('california');
+  const hasLocation = loc.length > 0;
+
+  // UAE/Gulf-specific tools injected first when relevant
+  const gccTools = isUAE ? [
+    { name:'Beehive', category:'Funding & Finance', what:'GCC peer-to-peer lending platform for SME financing', url:'beehive.finance', verdicts:['GO','PILOT'], modes:['stresstest','playground'], keywords:['funding','finance','sme','uae'], source:'location' },
+    { name:'Sarwa', category:'Funding & Finance', what:'UAE-based investment and wealth management platform', url:'sarwa.co', verdicts:['GO','PILOT'], modes:['stresstest','cleardoc'], keywords:['investment','finance','uae'], source:'location' },
+    { name:'Hub71', category:'Accelerators & Support', what:'Abu Dhabi global tech ecosystem — funding, mentorship, global network', url:'hub71.com', verdicts:['GO','PILOT','CAUTION'], modes:['stresstest','playground'], keywords:['startup','tech','uae','funding'], source:'location' },
+    { name:'Dtec', category:'Accelerators & Support', what:'Dubai Silicon Oasis tech accelerator and co-working hub', url:'dtec.ae', verdicts:['GO','PILOT'], modes:['playground','stresstest'], keywords:['startup','tech','dubai'], source:'location' },
+    { name:'Turn8', category:'Accelerators & Support', what:'Dubai-based seed accelerator focused on early-stage startups', url:'turn8.co', verdicts:['PILOT','GO'], modes:['playground'], keywords:['startup','early-stage','dubai'], source:'location' },
+    { name:'Dubai Chamber Digital', category:'Business Setup', what:'Dubai Chamber of Digital Economy — resources and support for digital businesses', url:'dced.gov.ae', verdicts:['GO','PILOT','CAUTION'], modes:['stresstest','cleardoc'], keywords:['uae','business','digital','compliance'], source:'location' },
+    { name:'UAE Pass', category:'Business Setup', what:'Official UAE digital identity for government services and business registration', url:'uaepass.ae', verdicts:['GO','PILOT','CAUTION','REDESIGN'], modes:['stresstest','cleardoc','burdenmine'], keywords:['uae','legal','compliance','government'], source:'location' },
+    { name:'Flat6Labs MENA', category:'Accelerators & Support', what:'MENA-focused accelerator with programmes across UAE, Egypt, Saudi Arabia', url:'flat6labs.com', verdicts:['GO','PILOT'], modes:['playground','stresstest'], keywords:['startup','mena','uae','funding'], source:'location' },
+  ] : [];
+
   const allTools = [
-    ...STATIC_TOOL_LIBRARY.map(t => ({...t, source:'static'})),
+    ...gccTools,
+    ...STATIC_TOOL_LIBRARY
+      .filter(t => {
+        // Filter out US-only tools when user is in UAE or India (unless no location)
+        if (!hasLocation) return true;
+        const usOnly = ['Stripe Atlas','Clerky','Mercury','Carta'];
+        if (isUAE && usOnly.includes(t.name)) return false;
+        if (isIndia && usOnly.includes(t.name)) return false;
+        return true;
+      })
+      .map(t => ({...t, source:'static'})),
     ...getAdminTools().map(t => ({...t, source:'admin'}))
   ];
 
   // Score every tool
-  const scored = allTools.map(t => ({ tool: t, score: scoreToolFit(t, result) }))
+  const scored = allTools.map(t => ({
+    tool: t,
+    score: scoreToolFit(t, result) + (t.source === 'location' ? 5 : 0) // boost location tools
+  }))
     .filter(x => x.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  // Pick top 6, max 2-3 categories, no duplicates
+  // Pick top 6, max 2-3 categories, no duplicates by name
   const selected = [];
   const usedCategories = {};
+  const usedNames = new Set();
   for (const { tool } of scored) {
     if (selected.length >= 6) break;
+    if (usedNames.has(tool.name)) continue;
     const cat = tool.category;
     if (!usedCategories[cat]) usedCategories[cat] = 0;
-    if (usedCategories[cat] >= 2) continue; // max 2 per category
-    if (Object.keys(usedCategories).length >= 3 && !usedCategories[cat]) continue; // max 3 categories
+    if (usedCategories[cat] >= 2) continue;
+    if (Object.keys(usedCategories).length >= 3 && !usedCategories[cat]) continue;
     usedCategories[cat]++;
+    usedNames.add(tool.name);
     selected.push(tool);
   }
+
+  // If no tools found — honest message
+  if (selected.length === 0 && hasLocation) {
+    selected.push({
+      name: 'Location-specific tools unavailable',
+      category: 'Advisory',
+      what: `We do not yet have curated tool recommendations for ${result.location}. We recommend consulting a local business advisor, chamber of commerce, or accelerator for on-the-ground resources.`,
+      url: '',
+      source: 'fallback'
+    });
+  }
+
   return selected;
 }
 
@@ -4443,6 +4770,24 @@ function renderAdminDashboard() {
       `<span style="background:rgba(42,82,152,0.15);border:1px solid rgba(42,82,152,0.2);color:rgba(255,255,255,0.7);padding:4px 10px;border-radius:20px;font-size:11px">${sec} <strong style="color:#7ab8f5">${n}</strong></span>`).join('');
 
   } catch(e) { console.error('Admin render error:', e); }
+
+  // ── ERROR LOG SECTION ──
+  const errContainer = document.getElementById('adminErrorLog');
+  if (errContainer) {
+    if (_errorLog.length === 0) {
+      errContainer.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px 0">No errors recorded this session. ✓</div>';
+    } else {
+      errContainer.innerHTML = _errorLog.slice().reverse().map(e => `
+        <div style="background:rgba(220,80,80,0.06);border:1px solid rgba(220,80,80,0.15);border-radius:6px;padding:12px 16px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:10px;letter-spacing:1px;color:rgba(220,150,150,0.7);font-family:'DM Mono',monospace">${e.type}</span>
+            <span style="font-size:10px;color:rgba(255,255,255,0.25);font-family:'DM Mono',monospace">${e.timestamp?.substring(0,19).replace('T',' ')}</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,180,180,0.8);line-height:1.5;word-break:break-all">${e.error}</div>
+          ${e.idea ? `<div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px">Idea: "${e.idea}"</div>` : ''}
+        </div>`).join('');
+    }
+  }
 
   // Render admin tool library
   renderAdminToolList();
